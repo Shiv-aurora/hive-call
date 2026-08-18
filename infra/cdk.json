@@ -1,0 +1,10 @@
+{
+  "app": "npx tsx bin/hive.ts",
+  "context": {
+    "tier1ModelId": "amazon.nova-micro-v1:0",
+    "tier2ModelId": "amazon.nova-pro-v1:0",
+    "bedrockModelId": "amazon.nova-pro-v1:0",
+    "bedrockEmbeddingModelId": "amazon.titan-embed-text-v2:0",
+    "runtimeSecretArn": ""
+  }
+}
