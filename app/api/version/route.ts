@@ -1,0 +1,1 @@
+export function GET() { return Response.json({ version: "0.2.0", build: process.env.BUILD_COMMIT?.slice(0, 12) ?? "local-production-adapters", aws: Boolean(process.env.AWS_REGION), cockroach: Boolean(process.env.DATABASE_URL) }); }
