@@ -1,0 +1,7 @@
+{
+  "label": "Synthetic deterministic held-out evaluation",
+  "cases": 40,
+  "memoryDisabled": { "tier1Coverage": 0, "tier2ReasoningCalls": 40, "humanEscalations": 11, "resolutionAccuracy": 1, "skillSelectionPrecision": 1, "policyViolations": 0, "medianSteps": 7 },
+  "memoryEnabled": { "tier1Coverage": 0.425, "tier2ReasoningCalls": 23, "humanEscalations": 11, "resolutionAccuracy": 1, "skillSelectionPrecision": 1, "policyViolations": 0, "medianSteps": 3 },
+  "notes": ["Source and shadow cases are excluded.", "Figures are fixture results, not production claims.", "Latency and dollar savings are intentionally not estimated."]
+}
