@@ -106,4 +106,4 @@ The stack creates Lambda, API Gateway, Secrets Manager, an encrypted private S3 
 - `docs/TRACEABILITY.md` — P0 requirement coverage and sponsor handoff status
 - `docs/submission.md` — submission copy, service explanation, and three-minute video storyboard
 
-MIT licensed. All customers and transactions are fictional.
+Licensed under the Apache License 2.0. All customers and transactions are fictional.
