@@ -1,23 +1,282 @@
-# HIVE
+# Hive Call
 
-> **Every escalation teaches HIVE how not to escalate next time.**
+> **The call center that learns from every resolved call.**
 
-HIVE is a self-learning contact-center system that compiles verified AI and human resolutions into bounded, validated support skills. The next similar call executes that procedure through Tier 1 and uses a fast conversational model without repeating full reasoning.
+Hive Call is a self-learning AI contact center that uses CockroachDB organizational memory for known issues, stronger reasoning for novel issues, and human judgment when necessary. Every verified resolution can become a validated reusable capability, allowing future calls to take the cheaper path.
 
-## The problem
+[**Open the live demo**](https://h0yzyuck8i.execute-api.us-east-1.amazonaws.com/demo)
 
-Support organizations repeatedly pay models and people to rediscover resolutions they have already found. Transcripts preserve conversation history, but they do not preserve an executable, policy-bound procedure. HIVE turns a verified resolution into versioned organizational capability without retraining the foundation model.
+## The idea
 
-## The proof
+Most AI support systems start every request from scratch. Even when the company has already solved the same problem, the next agent pays for another full reasoning pass—or sends the issue to another person.
 
-The guided demo runs four calls:
+Hive Call follows a different principle:
 
-1. A known late shipment resolves through an existing promoted skill, verified tools, and the fast response model with zero full-reasoning calls.
-2. A novel promotion refund reaches Tier 2, resolves, passes six shadow cases, and becomes promoted.
-3. A bundle/mixed-tender edge case reaches a human, whose verified trace becomes another promoted skill.
-4. A differently worded future case uses that newly learned skill in Tier 1 with one fast response call, zero full-reasoning calls, and no human handoff.
+> **Spend intelligence only where the company has not already learned the answer.**
 
-The integration suite replays that loop ten times from clean fixtures.
+Known problems execute validated procedures from CockroachDB. Novel problems receive stronger model reasoning. Ambiguous or unsafe problems remain human work. Once a resolution is verified, Hive Call can turn it into a bounded skill, validate it, persist it, and safely reuse it on a later call—without retraining the foundation model.
+
+## Progressive intelligence
+
+| Tier | When it runs | How it resolves the call |
+| --- | --- | --- |
+| **Tier 1 — Known territory** | A promoted skill safely matches the case | CockroachDB retrieval → deterministic skill execution → Amazon Nova Micro response |
+| **Tier 2 — Unknown territory** | No promoted skill safely applies | Targeted CockroachDB context → Amazon Nova Pro investigation and typed tools |
+| **Tier 3 — Human judgment** | Tier 2 cannot verify a safe resolution | Evidence-rich human handoff → verified resolution → the same learning pipeline |
+
+### Tier 1: Known territory
+
+When a promoted skill safely matches the current case, Hive Call:
+
+1. retrieves the validated skill from CockroachDB;
+2. executes its bounded deterministic procedure against customer state;
+3. sends only the resulting verified facts to Amazon Nova Micro; and
+4. asks Nova Micro to render the natural customer-facing response.
+
+The exact model is **Amazon Nova Micro** (`amazon.nova-micro-v1:0`). Nova Micro is not the business reasoner: the validated skill and deterministic tools have already produced the authoritative resolution.
+
+### Tier 2: Unknown territory
+
+When no promoted skill safely applies, Hive Call:
+
+1. retrieves targeted company context, policies, related verified cases, and customer state from CockroachDB;
+2. gives that bounded context and typed tools to Amazon Nova Pro; and
+3. lets Nova Pro investigate the novel problem and attempt a verified resolution.
+
+The exact model is **Amazon Nova Pro** (`amazon.nova-pro-v1:0`).
+
+### Tier 3: Human judgment
+
+If Tier 2 cannot verify a safe resolution, Hive Call escalates to a human with:
+
+- the conversation and customer issue;
+- evidence and tools already checked;
+- relevant company context; and
+- the exact reason for escalation.
+
+A verified human resolution can later enter the same learning pipeline as a model-assisted resolution. Hive Call does not assume every support issue should become autonomous: fraud, policy exceptions, high-impact decisions, and ambiguous cases can remain human work.
+
+## The learning loop
+
+> **verified resolution → candidate skill → shadow execution → policy/evidence checks → transactional promotion → future Tier 1**
+
+```mermaid
+flowchart LR
+    A["Verified resolution"] --> B["Candidate skill"]
+    B --> C["Shadow execution"]
+    C --> D["Policy and evidence checks"]
+    D --> E{"Validation passed?"}
+    E -- Yes --> F["Transactional promotion"]
+    E -- No --> G["Reject or revise"]
+    F --> H["CockroachDB organizational memory"]
+    H --> I["Future Tier 1 calls"]
+```
+
+### A skill is not a cached answer
+
+A learned skill is a bounded declarative procedure containing:
+
+- applicability conditions;
+- required customer and company context;
+- typed tool steps;
+- deterministic calculations and assertions;
+- policy dependencies;
+- allowed response facts;
+- escalation conditions;
+- source-case lineage; and
+- evaluation and promotion history.
+
+Generated arbitrary code is never executed. A model can propose a candidate skill, but it cannot promote its own output. Promotion occurs only after the proposed procedure executes against shadow cases and passes the required oracle, policy, and evidence checks.
+
+## Guided four-call demo
+
+The important demonstration is not simply that Hive Call answers four calls. It learns a capability during the demo, persists that capability in CockroachDB, and reuses it on a later call.
+
+### Call A — Known territory
+
+A customer reports a late shipment. Hive Call retrieves an existing promoted skill from CockroachDB, executes it deterministically, and asks Nova Micro to render the verified facts conversationally.
+
+- Full reasoning-model calls: **0**
+- Human escalations: **0**
+
+### Call B — Novel but solvable
+
+A customer asks why a $60 item produced only a $43 refund. No promoted skill safely applies.
+
+Nova Pro receives only the relevant order, refund, promotion, policy, company context, and typed tools. After resolving the case, the verified trace becomes a candidate skill. The procedure executes against six shadow cases, passes policy and evidence validation, and becomes eligible for promotion.
+
+### Call C — Human judgment
+
+A partial bundle return with mixed tender creates an ambiguous refund. Tier 1 has no safe match. Nova Pro investigates but cannot verify a safe resolution inside its policy boundary, so Hive Call escalates to a human.
+
+The verified human resolution is compiled into another candidate skill and validated through the same shadow-execution pipeline.
+
+### Call D — The payoff
+
+A different customer presents a differently worded instance of the problem learned from Call C. CockroachDB retrieves the newly promoted skill, and the call now resolves through Tier 1 using Nova Micro.
+
+- Previously required human judgment
+- Now resolved from learned organizational memory
+- Full reasoning-model calls: **0**
+- Human escalations: **0**
+
+## How CockroachDB powers Hive Call
+
+CockroachDB is not merely a transcript database. It is the authoritative persistent organizational-memory layer that changes how future calls execute.
+
+### 1. Learned resolution memory
+
+CockroachDB stores:
+
+- candidate, promoted, degraded, deprecated, rejected, and superseded skill versions;
+- source calls and verified resolutions;
+- tool traces and outcome evidence;
+- policy dependencies and versions;
+- shadow evaluations;
+- promotion and demotion events;
+- model and token telemetry; and
+- memory reads and audit lineage.
+
+A Tier 1 skill is eligible only when it is promoted, tenant-compatible, policy-compatible, and applicable to the current case.
+
+### 2. Company context memory
+
+CockroachDB also stores the context Tier 2 may need:
+
+- product information and plans;
+- billing rules and refund policies;
+- procedures and documentation;
+- customer state; and
+- related verified cases.
+
+Nova Pro receives targeted retrieved context—not the entire company database.
+
+### Distributed Vector Indexing
+
+Hive Call uses real `VECTOR(1024)` embeddings and three CockroachDB distributed vector indexes:
+
+- `skill_embedding_idx`
+- `call_embedding_idx`
+- `company_context_embedding_idx`
+
+Embeddings are generated by **Amazon Titan Text Embeddings V2** (`amazon.titan-embed-text-v2:0`).
+
+Vector similarity is only the first retrieval stage. A semantically similar skill is not automatically allowed to execute. After vector retrieval, Hive Call performs structured checks for:
+
+- tenant compatibility;
+- promotion state;
+- policy compatibility;
+- required context; and
+- applicability to the current case.
+
+Tier 1 intentionally optimizes for precision. A missed match costs a Nova Pro reasoning call; a false match can produce an incorrect customer answer.
+
+### CockroachDB Cloud Managed MCP Server
+
+Hive Call uses the **CockroachDB Cloud Managed MCP Server** as a separate, read-only inspection path into live organizational memory.
+
+The application persists evidence from a real Managed MCP lookup so the System Proof experience can independently demonstrate the live memory layer instead of relying only on the application's normal SQL query path. The separate Lambda-side MCP proxy is not claimed as verified proof.
+
+### Transactional learning
+
+Concurrent calls may propose overlapping skills. Promotion, supersession, demotion, and resolution finalization therefore use retryable, transactional, idempotent CockroachDB writes so organizational memory remains consistent under concurrency and retries.
+
+## AWS architecture
+
+```mermaid
+flowchart TD
+    A["Customer call"] --> B["CockroachDB memory search"]
+    B --> C{"Safe promoted skill?"}
+
+    C -- Yes --> D["Tier 1"]
+    D --> E["Deterministic skill execution"]
+    E --> F["Amazon Nova Micro"]
+    F --> G["Customer response"]
+
+    C -- No --> H["Tier 2"]
+    B --> I["Targeted company context"]
+    I --> H
+    H --> J["Amazon Nova Pro + typed tools"]
+    J --> K{"Safe verified resolution?"}
+    K -- Yes --> L["Verified resolution"]
+    K -- No --> M["Human judgment"]
+    M --> L
+
+    L --> N["Skill compiler"]
+    N --> O["Candidate skill"]
+    O --> P["Shadow validation"]
+    P --> Q{"Promote or reject"}
+    Q -- Promote --> R["CockroachDB relational + vector memory"]
+    Q -- Reject --> S["Audit history"]
+    R --> B
+```
+
+| Service | Role in Hive Call |
+| --- | --- |
+| **Amazon Bedrock — Amazon Nova Micro** (`amazon.nova-micro-v1:0`) | Tier 1 conversational renderer. It receives only selected promoted-skill data, verified facts, the authoritative resolution, the current issue, and response constraints. |
+| **Amazon Bedrock — Amazon Nova Pro** (`amazon.nova-pro-v1:0`) | Tier 2 reasoning, typed tool use, investigation, and bounded candidate-skill compilation. |
+| **Amazon Titan Text Embeddings V2** (`amazon.titan-embed-text-v2:0`) | Generates 1024-dimensional embeddings for calls, skills, and company context. |
+| **Amazon Polly** | Generates customer-facing speech with the Ruth voice and generative engine. |
+| **AWS Lambda** | Runs the deployed Next.js API and agent workflows. |
+| **Amazon API Gateway** | Exposes the public application and API surface. |
+| **Amazon S3** | Stores sanitized, content-addressed voice artifacts privately with encryption and lifecycle expiry. |
+| **Amazon CloudWatch** | Captures runtime logs, model/token metrics, latency, escalation metrics, rate-limit events, alarms, and dashboards. |
+| **AWS Secrets Manager** | Stores external database and MCP credentials outside the codebase. |
+| **AWS CDK** | Defines and deploys the AWS infrastructure. |
+
+## Production and safety boundaries
+
+Hive Call treats learned organizational memory as an execution system, so reuse is gated by explicit controls:
+
+- Only promoted skills can execute through Tier 1.
+- Learned skills conform to a typed schema and bounded declarative DSL.
+- Generated arbitrary code is never executed.
+- Shadow validation executes the proposed procedure rather than only comparing semantic similarity.
+- Oracle-fact and policy assertions verify procedure behavior.
+- Nova Micro output is checked against authoritative Tier 1 facts.
+- Policy versions are linked to learned skills.
+- Degraded skills are removed from Tier 1 eligibility.
+- Promotion and resolution finalization are transactional and idempotent.
+- Runtime-reader and reviewer APIs use separate roles.
+- Unauthenticated protected-memory access is rejected.
+- Bedrock and Titan calls use bounded timeouts.
+- Expensive public demo routes use CockroachDB-backed rate limits plus API Gateway throttling.
+- Polly audio is reused from private S3 instead of being regenerated unnecessarily.
+- CloudWatch records requests, model calls and tokens, latency, human escalation, and avoided full-reasoning calls.
+
+These controls do not imply that every support issue should become autonomous. Fraud, policy exceptions, high-impact decisions, and ambiguous cases can remain human work.
+
+## What makes Hive Call different
+
+- A **knowledge base** remembers information.
+- **Transcript search** remembers conversations.
+- A normal **AI support agent** reasons about the current request.
+- **Hive Call** remembers how a verified problem was resolved, when that resolution is valid, what evidence supports it, and how a future agent can execute it safely.
+
+The system improves its economics without retraining the foundation model. It spends stronger intelligence on genuinely new territory and reuses validated organizational capability everywhere else.
+
+## Technology stack
+
+- CockroachDB Cloud
+- CockroachDB Distributed Vector Indexing
+- CockroachDB Cloud Managed MCP Server
+- Amazon Bedrock
+- Amazon Nova Micro
+- Amazon Nova Pro
+- Amazon Titan Text Embeddings V2
+- AWS Lambda
+- Amazon Polly
+- Amazon S3
+- Amazon API Gateway
+- Amazon CloudWatch
+- AWS Secrets Manager
+- AWS CDK
+- Next.js 16
+- React
+- TypeScript
+- Zod
+- SQL
+- Vector search
 
 ## Run locally
 
@@ -26,84 +285,28 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:3000/demo`. Verification:
+Open `http://localhost:3000/demo`. Run the full validation suite with:
 
 ```bash
 npm run check
 ```
 
-The default local provider is deterministic. To exercise AWS locally, set `REASONING_PROVIDER=bedrock`, `AWS_REGION`, `TIER1_MODEL_ID`, and `TIER2_MODEL_ID` as shown in `.env.example`.
+The default local provider is deterministic. The deployed path uses the AWS models and services described above; environment names and safe placeholders are documented in `.env.example`.
 
-## Live demo
+## Scope and limitations
 
-The AWS deployment is available at [HIVE on AWS](https://h0yzyuck8i.execute-api.us-east-1.amazonaws.com/demo). Follow Calls A–D in order, then open Skills, Evaluation, and System Proof. The exact presenter sequence is in `docs/demo.md`.
+- The demo uses fictional Northstar Commerce customer, order, shipment, promotion, subscription, and refund data.
+- The web application simulates contact-center calls and human handoff.
+- Hive Call does not claim production telephony integration.
+- It does not claim a real customer deployment.
+- It does not claim measured dollar savings.
+- It does not claim 99% autonomous coverage.
+- Evaluation results describe synthetic demo fixtures and held-out cases, not production customer performance.
 
-## Architecture
+The submitted result is specifically the learning loop:
 
-```text
-Customer / call simulator
-          ↓
-      HIVE router
-   ┌──────┼────────┐
- Tier 1  Tier 2   Human
-   └──────┼────────┘
-      Verified resolution
-          ↓
-      Skill compiler
-          ↓
-     Shadow evaluator
-          ↓
- CockroachDB relational + vector memory
-          ↺
-```
+> **resolve once → validate the procedure → persist it in CockroachDB → let the next agent spend less intelligence solving it**
 
-Skills are declarative data: applicability predicates, typed tools, bounded computations, assertions, response templates, escalation rules, policy dependencies, and evidence lineage. Generated arbitrary code is never executed, and only promoted skills can enter Tier 1.
+## License
 
-Production services:
-
-- Amazon Bedrock Nova Micro for narrow Tier-1 conversational presentation.
-- Amazon Bedrock Nova Pro for bounded Tier-2 reasoning and skill compilation.
-- Titan Text Embeddings V2 for 1024-dimensional retrieval vectors.
-- Amazon Polly Ruth generative speech and private encrypted S3 artifacts.
-- AWS Lambda behind API Gateway, with CloudWatch logs, alarm, and dashboard.
-- CockroachDB relational memory and three distributed vector indexes for calls, learned skills, and company context, plus preserved Managed MCP lookup evidence.
-
-## Production path
-
-The deterministic learning loop remains available for repeatable evaluation. The production path adds Amazon Bedrock Converse reasoning and skill compilation, Titan 1024-dimensional embeddings, Polly voice, encrypted S3 artifact storage, CockroachDB transactions/vector search, a read-only Managed MCP adapter, health/readiness proof, and an AWS CDK deployment using Lambda Web Adapter and API Gateway.
-
-The app is deployed on AWS at `https://h0yzyuck8i.execute-api.us-east-1.amazonaws.com`. Live verification covers Nova Micro presentation, Nova Pro reasoning/tool use and compilation, Titan embeddings, Polly generative speech, private S3 audio reuse, Lambda, API Gateway, CloudWatch, CockroachDB SQL/vector memory, transactional promotion, and persisted Managed MCP evidence.
-
-## Evaluation
-
-`/demo/evaluation` derives correctness, skill-selection precision, routing rates, model calls/tokens, policy violations, median latency, promotions, and demotions from live CockroachDB telemetry. Its no-memory comparison is explicitly labeled as a counterfactual derived from observed verified Tier-1 routes; it does not invent dollar savings.
-
-## Deployment
-
-```bash
-npm run package:lambda
-npm run cdk:synth
-npm run cdk:deploy -- --require-approval never
-```
-
-The stack creates Lambda, API Gateway, Secrets Manager, an encrypted private S3 bucket, least-scope application IAM, logs, an alarm, and a dashboard. Populate the generated runtime secret with `DATABASE_URL`, `COCKROACH_MCP_URL`, and `COCKROACH_MCP_TOKEN`, then redeploy. Details are in `docs/aws-handoff.md`.
-
-## Limitations
-
-- Northstar Commerce customers and transactions are fictional fixtures.
-- Evaluation results measure the synthetic held-out set, not production customers or dollar savings.
-- The separate Lambda-side Managed MCP proxy remains disabled until its transport/auth path is independently verified; System Proof reports only the real Managed MCP lookup already performed and stored.
-- Real telephony, microphone speech recognition, and Amazon Connect are intentionally P1 rather than part of the primary demo.
-
-## Repository map
-
-- `app/` — landing page, guided app, skill library, evaluation, health routes
-- `lib/` — routing, tools, bounded DSL, AWS providers, Cockroach repositories, compilation, evaluation
-- `data/fixtures/` — fictional Northstar Commerce data
-- `db/migrations/` — CockroachDB schema and vector index
-- `infra/` — CDK stack for Lambda, API Gateway, S3, Secrets Manager, IAM, alarms, and dashboard
-- `tests/` — domain, production-adapter, and ten-run end-to-end learning-loop gates
-- `docs/TRACEABILITY.md` — P0 requirement coverage and sponsor handoff status
-- `docs/submission.md` — submission copy, service explanation, and three-minute video storyboard
-
-Licensed under the Apache License 2.0. All customers and transactions are fictional.
+Licensed under the [Apache License 2.0](LICENSE). All customers and transactions in the demo are fictional.
