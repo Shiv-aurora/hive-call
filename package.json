@@ -1,0 +1,46 @@
+{
+  "name": "hive-agentic-memory",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:db": "vitest run tests/integration/cockroach-live.test.ts",
+    "test:loop": "vitest run tests/integration/learning-loop.test.ts",
+    "check": "npm run typecheck && npm test && npm run build",
+    "package:lambda": "npm run build && tsx scripts/package-lambda.ts",
+    "cdk:synth": "npm run package:lambda && cd infra && npx cdk synth",
+    "cdk:deploy": "npm run package:lambda && cd infra && npx cdk deploy",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:learning-loop": "tsx scripts/run-live-learning-loop.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.1112.0",
+    "@aws-sdk/client-polly": "^3.1112.0",
+    "@aws-sdk/client-s3": "^3.1112.0",
+    "@hookform/resolvers": "latest",
+    "lucide-react": "latest",
+    "next": "latest",
+    "pg": "^8.23.0",
+    "react": "latest",
+    "react-dom": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/pg": "^8.23.1",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "aws-cdk": "^2.1137.0",
+    "aws-cdk-lib": "^2.265.0",
+    "constructs": "^10.8.1",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.23.12",
+    "typescript": "latest",
+    "vitest": "latest"
+  }
+}

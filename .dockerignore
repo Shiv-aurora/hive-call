@@ -1,0 +1,8 @@
+.git
+.next
+node_modules
+output
+.env*
+coverage
+infra/cdk.out
+npm-debug.log*

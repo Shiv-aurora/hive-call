@@ -1,0 +1,13 @@
+node_modules
+.next
+coverage
+.env*
+!.env.example
+npm-debug.log*
+infra/cdk.out
+cdk.out
+output
+.playwright-mcp
+tsconfig.tsbuildinfo
+dist
+.DS_Store
